@@ -1,4 +1,4 @@
-# http-router
+# guzzle-router
 [![Build Status](https://travis-ci.com/dburiy/guzzle-router.svg?branch=master)](https://travis-ci.com/dburiy/guzzle-router)
 [![Total Downloads](https://poser.pugx.org/dburiy/guzzle-router/d/total.png)](https://packagist.org/packages/dburiy/guzzle-router/stats)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
