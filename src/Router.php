@@ -51,6 +51,58 @@ class Router
     }
 
     /**
+     * Has route
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasRoute(string $name): bool
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
+     * Remove route
+     *
+     * @param string $name
+     */
+    public function removeRoute(string $name)
+    {
+        if (isset($this->routes[$name])) {
+            unset($this->routes[$name]);
+        }
+    }
+
+    /**
+     * Get route by name
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getRoute(string $name): array
+    {
+        return $this->routes[$name] ?? [];
+    }
+
+    /**
+     * Get all routes
+     *
+     * @return array
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    /**
+     * Remove all routes
+     */
+    public function cleanRoutes()
+    {
+        $this->routes = [];
+    }
+
+    /**
      * Map get request
      *
      * @param string $name

@@ -5,7 +5,7 @@
     "version": "2.0",
     "license": "MIT",
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "ext-json": "*",
         "guzzlehttp/guzzle": "^7.0.0"
     },
@@ -20,9 +20,11 @@
         "role": "Developer"
     }],
     "require-dev": {
-        "phpstan/phpstan": "^0.12.9"
+        "phpstan/phpstan": "^0.12.9",
+        "phpunit/phpunit": "^9.5"
     },
     "scripts": {
-        "phpstan" : "phpstan analyse -l 5 -c phpstan.neon src --no-interaction --no-progress"
+        "phpstan": "phpstan analyse -l 5 -c phpstan.neon src --no-interaction --no-progress",
+        "tests": "phpunit tests --bootstrap vendor/autoload.php"
     }
 }
