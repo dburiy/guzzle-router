@@ -2,7 +2,7 @@
     "name": "dburiy/guzzle-router",
     "description": "Guzzle router",
     "type": "library",
-    "version": "1.0",
+    "version": "1.1",
     "license": "MIT",
     "require": {
         "php": "^7.0",

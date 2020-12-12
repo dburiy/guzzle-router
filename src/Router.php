@@ -2,6 +2,7 @@
 
 namespace Dburiy\Router;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
@@ -44,20 +45,27 @@ class Router
      * @param string $name
      * @param array $params
      * @param array $options
-     *
-     * @return Response
-     * @throws GuzzleException
+     * @return ResponseInterface
+     * @throws Exception
      */
     public function call(string $name, array $params = [], array $options = []): ResponseInterface
     {
         if (empty($this->routes[$name])) {
-            throw new \Exception('route ['.$name.'] not found');
+            throw new Exception('route ['.$name.'] not found');
         }
         $request = $this->routes[$name];
         $method = strtolower($request['method']);
         $params = $params ? array_merge($request['arguments'], $params) : $request['arguments'];
         if ($params) {
             $options[$method == 'post' ? 'form_params' : 'query'] = $params;
+        }
+        if (preg_match_all('~\{([^\}]+)\}~', $request['path'], $m)) {
+            foreach ($m[1] as $param) {
+                if (!isset($params[$param])) {
+                    throw new Exception("required param '{$param}' not found");
+                }
+                $request['path'] = str_replace('{'.$param.'}', $params[$param], $request['path']);
+            }
         }
         return $this->client->request($method, $request['path'], $options);
     }
