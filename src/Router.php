@@ -4,18 +4,30 @@ namespace Dburiy\Router;
 
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Class Router
+ * @package Dburiy\Router
+ */
 class Router
 {
     private $routes = [];
     private $client;
+    private $settings;
 
-    public function __construct(Client $client)
+    /**
+     * Router constructor
+     *
+     * @param array $config
+     *
+     * Available settings
+     *   urlParamsFromOptions - (bool) get url params from options['urlParams'], default FALSE
+     */
+    public function __construct(array $config = [])
     {
-        $this->client = $client;
+        $this->client = new Client($config);
+        $this->settings = $config;
     }
 
     /**
@@ -25,13 +37,50 @@ class Router
      * @param string $name
      * @param string $path
      * @param array $arguments
-     *
      * @return Router
      */
     public function map(string $method, string $name, string $path, array $arguments = []): Router
     {
         $this->routes[$name] = [
             'method' => $method,
+            'path' => $path,
+            'arguments' => $arguments
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Map get request
+     *
+     * @param string $name
+     * @param string $path
+     * @param array $arguments
+     * @return $this
+     */
+    public function get(string $name, string $path, array $arguments = []): Router
+    {
+        $this->routes[$name] = [
+            'method' => 'get',
+            'path' => $path,
+            'arguments' => $arguments
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Map post request
+     *
+     * @param string $name
+     * @param string $path
+     * @param array $arguments
+     * @return $this
+     */
+    public function post(string $name, string $path, array $arguments = []): Router
+    {
+        $this->routes[$name] = [
+            'method' => 'post',
             'path' => $path,
             'arguments' => $arguments
         ];
@@ -56,17 +105,24 @@ class Router
         $request = $this->routes[$name];
         $method = strtolower($request['method']);
         $params = $params ? array_merge($request['arguments'], $params) : $request['arguments'];
-        if ($params) {
-            $options[$method == 'post' ? 'form_params' : 'query'] = $params;
-        }
         if (preg_match_all('~\{([^\}]+)\}~', $request['path'], $m)) {
+            $isUrlParamsFromOptions = (bool) ($this->settings['urlParamsFromOptions'] ?? false);
+            $urlParams = $isUrlParamsFromOptions
+                ? ($options['urlParams'] ?? [])
+                : $params
+            ;
             foreach ($m[1] as $param) {
                 if (!isset($params[$param])) {
                     throw new Exception("required param '{$param}' not found");
                 }
-                $request['path'] = str_replace('{'.$param.'}', $params[$param], $request['path']);
+                $request['path'] = str_replace('{'.$param.'}', $urlParams[$param], $request['path']);
+                if (!$isUrlParamsFromOptions) {
+                    unset($params[$param]);
+                }
             }
         }
+        $options[$method == 'post' ? 'form_params' : 'query'] = $params;
+
         return $this->client->request($method, $request['path'], $options);
     }
 
