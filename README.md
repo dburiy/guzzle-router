@@ -7,7 +7,7 @@
 The recommended way to install this package is through Composer:
 
 ```
-$ composer require dburiy/guzzle-router 1.0
+$ composer require dburiy/guzzle-router
 ```
 
 #### Example
