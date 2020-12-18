@@ -174,9 +174,12 @@ class Router
             }
         }
         $options[$method == 'post' ? 'form_params' : 'query'] = $params;
-        parse_str(parse_url($request['path'])['query'] ?? [], $query);
-        if ($query) {
-            $options['query'] = array_merge($options['query'], $query);
+        $parsed_url = parse_url($request['path']);
+        if (isset($parsed_url['query'])) {
+            parse_str($parsed_url['query'], $query);
+            if ($query) {
+                $options['query'] = array_merge($options['query'] ?? [], $query);
+            }
         }
 
         return $this->client->request($method, $request['path'], $options);
